@@ -1,17 +1,17 @@
 import React, { useState } from "react"
-import "./register.css"
+import "./login.css"
+import { useHistory } from "react-router-dom"
 import { Form, Button } from "react-bootstrap"
-import { Link } from "react-router-dom"
 
-const Register = () => {
+export const Login = () => {
   const [formData, setFormData] = useState({
-    name: "",
-    surname: "",
     email: "",
     password: "",
   })
 
-  const { name, surname, email, password } = formData
+  const { email, password } = formData
+
+  const history = useHistory()
 
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement>
@@ -19,7 +19,7 @@ const Register = () => {
     e.preventDefault()
     try {
       console.log(formData)
-      const response = await fetch("http://localhost:3005/users/register", {
+      const response = await fetch("http://localhost:3005/users/login", {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
@@ -29,17 +29,18 @@ const Register = () => {
       if (response.ok) {
         const data = await response.json()
         console.log(data)
+        localStorage.setItem("token", data.accessToken)
         setFormData({
-          name: "",
-          surname: "",
           email: "",
           password: "",
         })
+        history.push("/home")
       }
     } catch (error) {
       console.log(error)
     }
   }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -47,30 +48,10 @@ const Register = () => {
     })
   }
 
-  const signUpForm = () => {
+  const loginForm = () => {
     return (
       <div className="d-flex flex-column mt-4">
         <Form>
-          <Form.Group>
-            <Form.Label>Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={name}
-              placeholder="Enter Name"
-              onChange={handleChange}
-            />
-          </Form.Group>
-          <Form.Group className="login-input-wrap mb-4">
-            <Form.Label>Surname</Form.Label>
-            <Form.Control
-              type="text"
-              name="surname"
-              value={surname}
-              placeholder="Enter surname"
-              onChange={handleChange}
-            />
-          </Form.Group>
           <Form.Group className="login-input-wrap mb-4">
             <Form.Label>Email address</Form.Label>
             <Form.Control
@@ -96,9 +77,6 @@ const Register = () => {
             Submit
           </Button>
         </Form>
-        <Button className="mt-3" variant="secondary">
-          Login
-        </Button>
       </div>
     )
   }
@@ -119,10 +97,9 @@ const Register = () => {
           <div className="mb-4">
             <h2 className="mb-1">Sign up</h2>
           </div>
-          {signUpForm()}
+          {loginForm()}
         </div>
       </div>
     </div>
   )
 }
-export default Register
